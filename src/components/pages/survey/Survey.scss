@@ -1,0 +1,22 @@
+.mood-icon {
+  font-size: 5rem !important;
+}
+
+.mood-container {
+  margin: 1rem;
+}
+
+
+.mood-box {
+  border-radius: 0.2rem;
+  overflow: hidden;
+
+  &:hover {
+    background-color: rgba(0,0,0, 0.2);
+    cursor: pointer;
+  }
+
+  &.selected {
+    background-color: rgba(0,0,255, 0.2);
+  }
+}

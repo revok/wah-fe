@@ -1,13 +1,22 @@
+import * as dotenv from 'dotenv';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
+import './index.scss';
+import App from './components/app/App';
 import reportWebVitals from './reportWebVitals';
+import { BrowserRouter } from 'react-router-dom';
+
+// Load environment variables from .env
+// If you're running this through the infra project these variables
+// will already be in the environment through docker-compose.
+dotenv.config();
 
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
+  <BrowserRouter>
+      <React.StrictMode>
+        <App />
+      </React.StrictMode>
+  </BrowserRouter>,
   document.getElementById('root')
 );
 
