@@ -11,8 +11,8 @@ import axios from 'axios';
 const Survey: React.FC = () => {
 
   const BASE_URL = `http://${process.env.REACT_APP_API_HOST}:${process.env.REACT_APP_API_PORT}`;
-  const [selectedIdx, setValue] = React.useState(-1);
 
+  const [selectedIdx, setValue] = React.useState(-1);
   const [isSubmitted, setIsSubmitted] = React.useState(false);
 
   // This is equivalent to didMount for a functional component.
@@ -61,22 +61,42 @@ const Survey: React.FC = () => {
             Please select your current mood.
           </Typography>
         </Box>
-  
-        { isSubmitted }
-  
+
         <form noValidate>
-  
+
           <Box display="flex" justifyContent="space-between" alignItems="center" className="mood-container">
-  
-            <Box display="flex" flexGrow="1" justifyContent="center" className={`mood-box ${selectedIdx === 0 ? "selected" : ""}`} onClick={() => handleChange(0)}>
+
+            {/* BAD */}
+            <Box
+              display="flex"
+              flexGrow="1"
+              justifyContent="center"
+              className={`mood-box ${selectedIdx === 0 ? "selected" : ""}`}
+              onClick={() => handleChange(0)}
+            >
               <MoodBadIcon className="mood-icon" />
             </Box>
-  
-            <Box display="flex" flexGrow="1" justifyContent="center" className={`mood-box ${selectedIdx === 1 ? "selected" : ""}`} onClick={() => handleChange(1)}>
+
+            {/* NEUTRAL */}
+            <Box
+              display="flex"
+              flexGrow="1"
+              justifyContent="center"
+              className={`mood-box ${selectedIdx === 1 ? "selected" : ""}`}
+              onClick={() => handleChange(1)}
+            >
               <NeutralIcon className="mood-icon" />
             </Box>
   
-            <Box display="flex" flexGrow="1" justifyContent="center" className={`mood-box ${selectedIdx === 2 ? "selected" : ""}`} onClick={() => handleChange(2)}>
+
+            {/* GOOD */}
+            <Box
+              display="flex"
+              flexGrow="1"
+              justifyContent="center"
+              className={`mood-box ${selectedIdx === 1 ? "selected" : ""}`}
+              onClick={() => handleChange(2)}
+            >
               <SentimentVerySatisfiedIcon className="mood-icon" />
             </Box>
           </Box>

@@ -14,6 +14,7 @@ import Login from '../pages/login/Login';
 import Admin from '../pages/admin/Admin';
 import Survey from '../pages/survey/Survey';
 import AssessmentIcon from '@material-ui/icons/Assessment'
+import SentimentVerySatisfiedIcon from '@material-ui/icons/SentimentVerySatisfied';
 
 const App: React.FC = () => {
   return (
@@ -33,10 +34,11 @@ const App: React.FC = () => {
             </IconButton>
           </Link>
 
-          <Box flexGrow="1">
-            <Typography align="center">
-              JOYTRON 5000
-            </Typography>
+          <Box className="title" flexGrow="1" display="flex" justifyContent="center" alignItems="center">
+              J.O.Y.T.R.O.N.  5
+              <SentimentVerySatisfiedIcon className="logo-icon" />
+              <SentimentVerySatisfiedIcon className="logo-icon" />
+              <SentimentVerySatisfiedIcon className="logo-icon" />
           </Box>
 
           <Link to="/login">
