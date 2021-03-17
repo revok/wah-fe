@@ -87,21 +87,19 @@ const Survey: React.FC = () => {
             >
               <NeutralIcon className="mood-icon" />
             </Box>
-  
 
             {/* GOOD */}
             <Box
               display="flex"
               flexGrow="1"
               justifyContent="center"
-              className={`mood-box ${selectedIdx === 1 ? "selected" : ""}`}
+              className={`mood-box ${selectedIdx === 2 ? "selected" : ""}`}
               onClick={() => handleChange(2)}
             >
               <SentimentVerySatisfiedIcon className="mood-icon" />
             </Box>
           </Box>
-  
-  
+
           <Button
             type="submit"
             fullWidth

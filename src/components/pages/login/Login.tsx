@@ -32,8 +32,6 @@ const Login: React.FC = (props) => {
     if (username && password) {
       axios.post(`${BASE_URL}/user/login`, { username, password })
         .then((response: AxiosResponse) => {
-
-          console.log(response);
           localStorage.setItem('token', response.data['token']);
           setIsAuthenticated(true);
         })
@@ -43,8 +41,6 @@ const Login: React.FC = (props) => {
         });
     }
   }
-
-
 
   return (
     <div className="form-container">

@@ -1,11 +1,16 @@
-import React from 'react';
-import './Admin.scss';
-import { makeStyles, Theme } from '@material-ui/core/styles';
+import { Container } from '@material-ui/core';
 import AppBar from '@material-ui/core/AppBar';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
+import { makeStyles, Theme } from '@material-ui/core/styles';
+import Tab from '@material-ui/core/Tab';
+import Tabs from '@material-ui/core/Tabs';
+import React, { useEffect } from 'react';
+import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
+import { Container as DiContainer } from 'typedi';
+import { IGroupedEntry } from '../../../interfaces/groupedEntry.interface';
+import ApiService from '../../../services/api.service';
+import './Admin.scss';
+
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -21,23 +26,19 @@ function TabPanel(props: TabPanelProps) {
       role="tabpanel"
       hidden={value !== index}
       id={`simple-tabpanel-${index}`}
+      className="tabpanel"
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
       {value === index && (
-        <Box p={3}>
-          <Typography>{children}</Typography>
-        </Box>
+        <Container>
+          <Box>
+            {children}
+          </Box>
+        </Container>
       )}
     </div>
   );
-}
-
-function a11yProps(index: any) {
-  return {
-    id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
-  };
 }
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -49,31 +50,105 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 const Admin: React.FC = () => {
   const classes = useStyles();
-  const [value, setValue] = React.useState(0);
+  const [selectedTab, setSelectedTab] = React.useState(0);
 
-  const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
-    setValue(newValue);
+  const [data, setData] = React.useState([] as IGroupedEntry[]);
+
+  const handleTabChange = (event: React.ChangeEvent<{}> | undefined, newValue: number) => {
+    setSelectedTab(newValue);
+
+    let granularity;
+    switch (newValue) {
+      case 0:
+        granularity = 'day';
+        break;
+
+      case 1:
+        granularity = 'month';
+        break;
+
+      case 2:
+      default:
+        granularity = 'year';
+        break;
+    }
+
+    loadData(granularity);
+  };
+
+
+  const loadData = (granularity: string) => {
+    const apiService = DiContainer.get(ApiService);
+    apiService.getGroupedData(granularity)
+    .then((d) => {
+      return setData(d);
+
+    });
+  }
+
+
+   // This is equivalent to didMount for a functional component.
+  // Check if we already submitted today.
+  useEffect(() => {
+    handleTabChange(undefined, selectedTab);
+  }, []);
+
+
+  const renderTab = () => {
+
+    if(!(Array.isArray(data) && data.length)) {
+      return (
+        <div className="chart-container">
+          <Box width="100%" height="100%" display="flex" justifyContent="center" alignItems="center">
+            Sorry, no data yet!
+          </Box>
+        </div>
+      )
+    }
+
+    return (
+      <div className="chart-container">
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart width={400} height={400}>
+            <Pie
+              dataKey="value"
+              data={data}
+              label={(entry) => ` ${entry.name} `}
+              cx="50%"
+              cy="50%"
+              fill="#8884d8"
+            >
+              {data.map((entry, index) => <Cell key={entry.name} fill={entry.color} />)}
+            </Pie>
+            <Tooltip />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+    );
   };
 
   return (
     <div className="form-container">
       <div className={classes.root}>
+
         <AppBar position="static">
-          <Tabs value={value} onChange={handleChange} aria-label="statistics">
-            <Tab label="Day" {...a11yProps(0)} />
-            <Tab label="Month" {...a11yProps(1)} />
-            <Tab label="Year" {...a11yProps(2)} />
+          <Tabs value={selectedTab} onChange={handleTabChange} aria-label="statistics">
+            <Tab label="Day" />
+            <Tab label="Month" />
+            <Tab label="Year" />
           </Tabs>
         </AppBar>
 
-        <TabPanel value={value} index={0}>
-          Item One
+        <TabPanel value={selectedTab} index={0}>
+          { renderTab() }
         </TabPanel>
-        <TabPanel value={value} index={1}>
-          Item Two
+
+        <TabPanel value={selectedTab} index={1}>
+          { renderTab() }
         </TabPanel>
-        <TabPanel value={value} index={2}>
-          Item Three
+
+        <TabPanel value={selectedTab} index={2}>
+          { renderTab() }
         </TabPanel>
       </div>
     </div>

@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import * as dotenv from 'dotenv';
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -5,6 +6,14 @@ import './index.scss';
 import App from './components/app/App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter } from 'react-router-dom';
+import axiosInstance from './services/axios.service';
+import { Container } from 'typedi';
+
+/*
+* Inject the singleton into the DI container.
+* This will (would) provide a lot of flexibility at the time of writing unit tests.
+*/
+Container.set('apiInstance', axiosInstance);
 
 // Load environment variables from .env
 // If you're running this through the infra project these variables
