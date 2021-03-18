@@ -45,8 +45,6 @@ const Survey: React.FC = () => {
         apiService
           .postEntry(selectedIdx)
           .then((e) => {
-            debugger;
-
             if (e) {
               setIsSubmitted(true);
             }
