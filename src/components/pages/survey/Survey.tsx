@@ -3,15 +3,14 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import MoodBadIcon from '@material-ui/icons/MoodBad';
 import SentimentVerySatisfiedIcon from '@material-ui/icons/SentimentVerySatisfied';
+import moment from 'moment';
 import React, { MouseEvent, useEffect } from 'react';
+import { Container as DiContainer } from 'typedi';
+import ApiService from '../../../services/api.service';
 import NeutralIcon from '../../shared/neutralIcon/NeutralIcon';
 import './Survey.scss';
-import axios from 'axios';
-import moment from 'moment';
 
 const Survey: React.FC = () => {
-
-  const BASE_URL = `http://${process.env.REACT_APP_API_HOST}:${process.env.REACT_APP_API_PORT}`;
 
   const [selectedIdx, setSelectedIdx] = React.useState(-1);
   const [isSubmitted, setIsSubmitted] = React.useState(false);
@@ -39,12 +38,20 @@ const Survey: React.FC = () => {
     event.preventDefault();
 
     if (selectedIdx !== -1) {
-      axios.post(`${BASE_URL}/entry/new`, { value: selectedIdx })
-        .then(res => {
-          const lastSubmit = res.data.createdAt;
-          localStorage.setItem('lastSubmit', lastSubmit);
-          setIsSubmitted(true);
-        })
+
+      const apiService = DiContainer.get(ApiService);
+
+      if (apiService) {
+        apiService
+          .postEntry(selectedIdx)
+          .then((e) => {
+            debugger;
+
+            if (e) {
+              setIsSubmitted(true);
+            }
+          });
+      }
     }
   }
 

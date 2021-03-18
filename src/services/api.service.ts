@@ -16,6 +16,35 @@ export default class ApiService {
     return Container.get('apiInstance') as AxiosInstance;
   }
 
+
+  /**
+   * Post a new survey entry to the API.
+   * 
+   * @param value 
+   * @returns IEntry
+   */
+  postEntry(value: number): Promise<IEntry> {
+    const api = this._getApiService();
+
+    if (api) {
+      let request = '/entry/new';
+
+      return api
+        .post(request, {value})
+        .then((res) => {
+
+          if (res.data) {
+            const lastSubmit = res.data.createdAt;
+            localStorage.setItem('lastSubmit', lastSubmit);
+          }
+
+          return res.data;
+        });
+    } else {
+      return Promise.reject();
+    }
+  }
+
   /**
    * Retrieve entries from storage.
    * @param granularity {string} year/month/day or empty.
@@ -91,8 +120,8 @@ export default class ApiService {
   }
 
   /**
-   * Login a user
-   * @returns jwt token.
+   * Login a user (will set the token in localstorage)
+   * @returns payload with jwt token.
    */
   authenticateUser (user: IUser): Promise<IUser> {
     const api = this._getApiService();
