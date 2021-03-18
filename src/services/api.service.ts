@@ -1,7 +1,8 @@
-import { AxiosInstance } from 'axios';
+import { AxiosInstance, AxiosResponse } from 'axios';
 import { Container, Service } from 'typedi';
 import { IEntry } from '../interfaces/entry.interface';
 import { IGroupedEntry } from '../interfaces/groupedEntry.interface';
+import { IUser } from '../interfaces/user.interface';
 
 
 @Service()
@@ -84,6 +85,43 @@ export default class ApiService {
 
         return result;
       });
+    } else {
+      return Promise.reject();
+    }
+  }
+
+  /**
+   * Login a user
+   * @returns jwt token.
+   */
+  authenticateUser (user: IUser): Promise<IUser> {
+    const api = this._getApiService();
+
+    if (api) {
+      return api.post('/user/login', { username: user.username, password: user.password })
+      .then((response: AxiosResponse) => {
+        localStorage.setItem('token', response.data['token']);
+        window.dispatchEvent( new Event('storage') );
+        return response.data;
+      });
+    } else {
+      return Promise.reject();
+    }
+  }
+
+  /**
+   * Validate a token. (used to guard routes)
+   * Token will be sent automatically through axios interceptor.
+   * @returns jwt token.
+   */
+  validateToken (): Promise<boolean> {
+    const api = this._getApiService();
+
+    if (api) {
+      return api.get('user/validateToken')
+        .then((response: AxiosResponse) => {
+          return response.status === 200;
+        });
     } else {
       return Promise.reject();
     }

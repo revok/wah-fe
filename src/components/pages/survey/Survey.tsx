@@ -4,15 +4,16 @@ import Typography from '@material-ui/core/Typography';
 import MoodBadIcon from '@material-ui/icons/MoodBad';
 import SentimentVerySatisfiedIcon from '@material-ui/icons/SentimentVerySatisfied';
 import React, { MouseEvent, useEffect } from 'react';
-import NeutralIcon from '../../NeutralIcon/NeutralIcon';
+import NeutralIcon from '../../shared/neutralIcon/NeutralIcon';
 import './Survey.scss';
 import axios from 'axios';
+import moment from 'moment';
 
 const Survey: React.FC = () => {
 
   const BASE_URL = `http://${process.env.REACT_APP_API_HOST}:${process.env.REACT_APP_API_PORT}`;
 
-  const [selectedIdx, setValue] = React.useState(-1);
+  const [selectedIdx, setSelectedIdx] = React.useState(-1);
   const [isSubmitted, setIsSubmitted] = React.useState(false);
 
   // This is equivalent to didMount for a functional component.
@@ -21,22 +22,17 @@ const Survey: React.FC = () => {
     const lastSubmitTimestamp = localStorage.getItem('lastSubmit');
 
     if (lastSubmitTimestamp) {
-      const today = new Date();
-      const lastSubmit = new Date(lastSubmitTimestamp);
-
-      const isSameDay = today.getFullYear() === lastSubmit.getFullYear() &&
-                        today.getMonth() === lastSubmit.getMonth() &&
-                        today.getDate() === lastSubmit.getDate();
-
-      setIsSubmitted(isSameDay)
+      const today = moment();
+      const lastSubmit = moment(lastSubmitTimestamp);
+      setIsSubmitted(lastSubmit.isSame(today, 'day'));
     } else {
       setIsSubmitted(false);
     }
   }, []);
 
 
-  const handleChange = (newValue: number) => {
-    setValue(newValue);
+  const handleSelectionChange = (newValue: number) => {
+    setSelectedIdx(newValue);
   };
 
   const handleSubmit = (event: MouseEvent) => {
@@ -72,7 +68,7 @@ const Survey: React.FC = () => {
               flexGrow="1"
               justifyContent="center"
               className={`mood-box ${selectedIdx === 0 ? "selected" : ""}`}
-              onClick={() => handleChange(0)}
+              onClick={() => handleSelectionChange(0)}
             >
               <MoodBadIcon className="mood-icon" />
             </Box>
@@ -83,7 +79,7 @@ const Survey: React.FC = () => {
               flexGrow="1"
               justifyContent="center"
               className={`mood-box ${selectedIdx === 1 ? "selected" : ""}`}
-              onClick={() => handleChange(1)}
+              onClick={() => handleSelectionChange(1)}
             >
               <NeutralIcon className="mood-icon" />
             </Box>
@@ -94,7 +90,7 @@ const Survey: React.FC = () => {
               flexGrow="1"
               justifyContent="center"
               className={`mood-box ${selectedIdx === 2 ? "selected" : ""}`}
-              onClick={() => handleChange(2)}
+              onClick={() => handleSelectionChange(2)}
             >
               <SentimentVerySatisfiedIcon className="mood-icon" />
             </Box>
@@ -120,7 +116,7 @@ const Survey: React.FC = () => {
     <div className="Survey form-container">
       <Box display="flex" alignItems="center" justifyContent="center">
         <Typography component="h1" variant="h5">
-          Thank you! See you tomorrow!
+          Thank you! See you { moment().isoWeekday() === 5 ? <span>monday</span> : <span>tomorrow</span> }!
         </Typography>
 
         <SentimentVerySatisfiedIcon />

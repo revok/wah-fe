@@ -4,14 +4,13 @@ import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import React, { FormEventHandler } from 'react';
-import { Redirect } from 'react-router-dom'
+import React from 'react';
+import { Redirect } from 'react-router-dom';
+import { Container as DiContainer } from 'typedi';
+import ApiService from '../../../services/api.service';
 import './Login.scss';
-import axios, { AxiosResponse } from 'axios';
 
 const Login: React.FC = (props) => {
-  const BASE_URL = `http://${process.env.REACT_APP_API_HOST}:${process.env.REACT_APP_API_PORT}`;
-
   const [username, setUserName] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [isAuthenticated, setIsAuthenticated] = React.useState(false);
@@ -20,25 +19,17 @@ const Login: React.FC = (props) => {
     return <Redirect to="/admin" />
   }
 
-  // If we already have a token, validate it.
-  axios.get(`${BASE_URL}/user/validateToken`)
-  .then(res => {
-    setIsAuthenticated(true);
-  })
-
   const handleSubmit = (event: React.SyntheticEvent ) => {
     event.preventDefault();
 
     if (username && password) {
-      axios.post(`${BASE_URL}/user/login`, { username, password })
-        .then((response: AxiosResponse) => {
-          localStorage.setItem('token', response.data['token']);
-          setIsAuthenticated(true);
-        })
-        .catch(err => {
-          console.error(err);
-          alert('Error logging in please try again');
-        });
+      const apiService = DiContainer.get(ApiService);
+
+      if (apiService) {
+        apiService
+          .authenticateUser({ username, password })
+          .then(() => setIsAuthenticated(true));
+      }
     }
   }
 

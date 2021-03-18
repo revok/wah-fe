@@ -1,7 +1,6 @@
 import { Container } from '@material-ui/core';
 import AppBar from '@material-ui/core/AppBar';
 import Box from '@material-ui/core/Box';
-import { makeStyles, Theme } from '@material-ui/core/styles';
 import Tab from '@material-ui/core/Tab';
 import Tabs from '@material-ui/core/Tabs';
 import React, { useEffect } from 'react';
@@ -10,8 +9,6 @@ import { Container as DiContainer } from 'typedi';
 import { IGroupedEntry } from '../../../interfaces/groupedEntry.interface';
 import ApiService from '../../../services/api.service';
 import './Admin.scss';
-
-
 interface TabPanelProps {
   children?: React.ReactNode;
   index: any;
@@ -41,24 +38,15 @@ function TabPanel(props: TabPanelProps) {
   );
 }
 
-const useStyles = makeStyles((theme: Theme) => ({
-  root: {
-    flexGrow: 1,
-    backgroundColor: theme.palette.background.paper,
-  },
-}));
-
 const Admin: React.FC = () => {
-  const classes = useStyles();
   const [selectedTab, setSelectedTab] = React.useState(0);
 
   const [data, setData] = React.useState([] as IGroupedEntry[]);
 
-  const handleTabChange = (event: React.ChangeEvent<{}> | undefined, newValue: number) => {
-    setSelectedTab(newValue);
-
+  // Load data when selected tab changes.
+  useEffect(() => {
     let granularity;
-    switch (newValue) {
+    switch (selectedTab) {
       case 0:
         granularity = 'day';
         break;
@@ -74,25 +62,22 @@ const Admin: React.FC = () => {
     }
 
     loadData(granularity);
+  }, [ selectedTab ]);
+
+  const handleTabChange = (event: React.ChangeEvent<{}> | undefined, newValue: number) => {
+    setSelectedTab(newValue);
   };
 
 
   const loadData = (granularity: string) => {
     const apiService = DiContainer.get(ApiService);
-    apiService.getGroupedData(granularity)
-    .then((d) => {
-      return setData(d);
 
-    });
+    if (apiService) {
+      apiService
+        .getGroupedData(granularity)
+        .then((d) => setData(d));
+    }
   }
-
-
-   // This is equivalent to didMount for a functional component.
-  // Check if we already submitted today.
-  useEffect(() => {
-    handleTabChange(undefined, selectedTab);
-  }, []);
-
 
   const renderTab = () => {
 
@@ -109,7 +94,7 @@ const Admin: React.FC = () => {
     return (
       <div className="chart-container">
         <ResponsiveContainer width="100%" height="100%">
-          <PieChart width={400} height={400}>
+          <PieChart width={400} height={400} key={selectedTab}>
             <Pie
               dataKey="value"
               data={data}
@@ -129,28 +114,25 @@ const Admin: React.FC = () => {
 
   return (
     <div className="form-container">
-      <div className={classes.root}>
+      <AppBar position="static">
+        <Tabs value={selectedTab} onChange={handleTabChange} aria-label="statistics">
+          <Tab label="Day" />
+          <Tab label="Month" />
+          <Tab label="Year" />
+        </Tabs>
+      </AppBar>
 
-        <AppBar position="static">
-          <Tabs value={selectedTab} onChange={handleTabChange} aria-label="statistics">
-            <Tab label="Day" />
-            <Tab label="Month" />
-            <Tab label="Year" />
-          </Tabs>
-        </AppBar>
+      <TabPanel value={selectedTab} index={0}>
+        { renderTab() }
+      </TabPanel>
 
-        <TabPanel value={selectedTab} index={0}>
-          { renderTab() }
-        </TabPanel>
+      <TabPanel value={selectedTab} index={1}>
+        { renderTab() }
+      </TabPanel>
 
-        <TabPanel value={selectedTab} index={1}>
-          { renderTab() }
-        </TabPanel>
-
-        <TabPanel value={selectedTab} index={2}>
-          { renderTab() }
-        </TabPanel>
-      </div>
+      <TabPanel value={selectedTab} index={2}>
+        { renderTab() }
+      </TabPanel>
     </div>
   );
 };
