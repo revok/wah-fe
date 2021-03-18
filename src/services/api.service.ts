@@ -100,8 +100,11 @@ export default class ApiService {
     if (api) {
       return api.post('/user/login', { username: user.username, password: user.password })
       .then((response: AxiosResponse) => {
-        localStorage.setItem('token', response.data['token']);
-        window.dispatchEvent( new Event('storage') );
+        if (response.data && response.data['token']) {
+          localStorage.setItem('token', response.data['token']);
+          window.dispatchEvent( new Event('storage') );
+        }
+
         return response.data;
       });
     } else {
