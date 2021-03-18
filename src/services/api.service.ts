@@ -60,7 +60,9 @@ export default class ApiService {
         request += `?granularity=${granularity}`;
       }
 
-      return api.get(request).then((d) => d.data);
+      return api
+        .get(request)
+        .then((d) => d.data);
     } else {
       return Promise.reject();
     }
@@ -81,39 +83,41 @@ export default class ApiService {
         request += `?granularity=${granularity}`;
       }
 
-      return api.get(request).then((d) => {
-        let result = d.data;
-
-        if (Array.isArray(result)) {
-          result = result
-            .map((e) => {
-              let translatedLabel;
-
-              switch (`${e.name}`) {
-                case "0":
-                  translatedLabel = 'bad';
-                  e.color = 'red';
-                  break;
-                case "1":
-                  translatedLabel = 'neutral';
-                  e.color = 'blue';
-                  break;
-                case "2":
-                  translatedLabel = 'good';
-                  e.color = 'green';
-                  break;
-              }
-
-              return {
-                ...e,
-                name: translatedLabel
-              };
-            })
-            .sort((a, b) => a.name - b.name)
-        }
-
-        return result;
-      });
+      return api
+        .get(request)
+        .then((d) => {
+          let result = d.data;
+  
+          if (Array.isArray(result)) {
+            result = result
+              .map((e) => {
+                let translatedLabel;
+  
+                switch (`${e.name}`) {
+                  case "0":
+                    translatedLabel = 'bad';
+                    e.color = 'red';
+                    break;
+                  case "1":
+                    translatedLabel = 'neutral';
+                    e.color = 'blue';
+                    break;
+                  case "2":
+                    translatedLabel = 'good';
+                    e.color = 'green';
+                    break;
+                }
+  
+                return {
+                  ...e,
+                  name: translatedLabel
+                };
+              })
+              .sort((a, b) => a.name - b.name)
+          }
+  
+          return result;
+        });
     } else {
       return Promise.reject();
     }
@@ -127,15 +131,16 @@ export default class ApiService {
     const api = this._getApiService();
 
     if (api) {
-      return api.post('/user/login', { username: user.username, password: user.password })
-      .then((response: AxiosResponse) => {
-        if (response.data && response.data['token']) {
-          localStorage.setItem('token', response.data['token']);
-          window.dispatchEvent( new Event('storage') );
-        }
-
-        return response.data;
-      });
+      return api
+        .post('/user/login', { username: user.username, password: user.password })
+        .then((response: AxiosResponse) => {
+          if (response.data && response.data['token']) {
+            localStorage.setItem('token', response.data['token']);
+            window.dispatchEvent( new Event('storage') );
+          }
+  
+          return response.data;
+        });
     } else {
       return Promise.reject();
     }
@@ -150,7 +155,8 @@ export default class ApiService {
     const api = this._getApiService();
 
     if (api) {
-      return api.get('user/validateToken')
+      return api
+        .get('user/validateToken')
         .then((response: AxiosResponse) => {
           return response.status === 200;
         });
